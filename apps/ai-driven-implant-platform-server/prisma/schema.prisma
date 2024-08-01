@@ -1,0 +1,96 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Doctor {
+  createdAt      DateTime  @default(now())
+  email          String?
+  id             String    @id @default(cuid())
+  name           String?
+  patients       Patient[]
+  specialization String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model Patient {
+  age                Int?
+  createdAt          DateTime            @default(now())
+  doctor             Doctor?             @relation(fields: [doctorId], references: [id])
+  doctorId           String?
+  failurePredictions FailurePrediction[]
+  gender             EnumPatientGender?
+  id                 String              @id @default(cuid())
+  name               String?
+  recommendations    Recommendation[]
+  reports            Report[]
+  simulations        Simulation[]
+  updatedAt          DateTime            @updatedAt
+}
+
+model FailurePrediction {
+  createdAt  DateTime @default(now())
+  id         String   @id @default(cuid())
+  implant    Implant? @relation(fields: [implantId], references: [id])
+  implantId  String?
+  patient    Patient? @relation(fields: [patientId], references: [id])
+  patientId  String?
+  prediction String?
+  updatedAt  DateTime @updatedAt
+}
+
+model Report {
+  createdAt DateTime             @default(now())
+  file      Json?
+  id        String               @id @default(cuid())
+  patient   Patient?             @relation(fields: [patientId], references: [id])
+  patientId String?
+  typeField EnumReportTypeField?
+  updatedAt DateTime             @updatedAt
+}
+
+model Simulation {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  implant   Implant? @relation(fields: [implantId], references: [id])
+  implantId String?
+  notes     String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
+  updatedAt DateTime @updatedAt
+}
+
+model Recommendation {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  implant   Implant? @relation(fields: [implantId], references: [id])
+  implantId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
+  reason    String?
+  updatedAt DateTime @updatedAt
+}
+
+model Implant {
+  createdAt          DateTime            @default(now())
+  failurePredictions FailurePrediction[]
+  id                 String              @id @default(cuid())
+  manufacturer       String?
+  name               String?
+  recommendations    Recommendation[]
+  simulations        Simulation[]
+  specifications     String?
+  updatedAt          DateTime            @updatedAt
+}
+
+enum EnumPatientGender {
+  Option1
+}
+
+enum EnumReportTypeField {
+  Option1
+}
